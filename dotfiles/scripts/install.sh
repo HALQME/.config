@@ -29,7 +29,7 @@ else
     echo "Setting up dotfiles for the first time..."
 fi
 nix --extra-experimental-features "nix-command flakes" run nixpkgs#git clone https://github.com/halqme/.config
-if [ ! -f "${CONFIG_DIR}" ]; then
+if [ ! -d "${CONFIG_DIR}" ]; then
     echo "Clone Failed"
     exit 1
 fi
