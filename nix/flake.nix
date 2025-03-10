@@ -18,10 +18,7 @@
               direnv
               gh
               git
-              htop
-              jq
               lazygit
-              lsd
               neovim
               xh
           ];
