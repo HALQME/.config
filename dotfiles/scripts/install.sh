@@ -10,9 +10,6 @@ SCRIPTS_DIR="${DOTFILES_DIR}/scripts"
 
 BASE_URL="https://raw.githubusercontent.com/halqme/.config/main"
 
-# Create necessary directories
-mkdir -p "${NIX_DIR}"
-
 # Function to check if command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
@@ -24,41 +21,28 @@ if ! command_exists nix; then
     exit 1
 fi
 
-# Clone or update dotconfig repository
-if [ -d "${DOTFILES_DIR}" ]; then
+# Clone dotconfig repository
+if [ -d "${CONFIG_DIR}" ]; then
     echo "Dotfiles directory already exists, updating from repository..."
-    # Since git is not available, we'll download the latest files
-    mkdir -p "${DOTFILES_DIR}/temp"
-    curl -s "${BASE_URL}/dotfiles/scripts/install.sh" -o "${SCRIPTS_DIR}/install.sh"
-    curl -s "${BASE_URL}/nix/flake.nix" -o "${NIX_DIR}/flake.nix"
-    chmod +x "${SCRIPTS_DIR}/install.sh"
+    mv "${CONFIG_DIR}" "${CONFIG_DIR}.bak"
 else
     echo "Setting up dotfiles for the first time..."
-    mkdir -p "${DOTFILES_DIR}/scripts"
-    curl -s "${BASE_URL}/dotfiles/scripts/install.sh" -o "${SCRIPTS_DIR}/install.sh"
-    curl -s "${BASE_URL}/nix/flake.nix" -o "${NIX_DIR}/flake.nix"
-    chmod +x "${SCRIPTS_DIR}/install.sh"
 fi
+nix run nixpkgs#git clone https://github.com/halqme/.config
+if [ ! -f "${CONFIG_DIR}" ]; then
+    echo "Clone Failed"
+    exit 1
+fi
+chmod +x "${SCRIPTS_DIR}/install.sh"
 
 # Apply nix configuration
 echo "Deploying Nix configuration..."
 if [ -f "${NIX_DIR}/flake.nix" ]; then
     cd "${NIX_DIR}"
-    # Enable flakes if not already enabled
-    if ! nix config show | grep 'experimental-features.*flakes' >/dev/null; then
-        echo 'experimental-features = nix-command flakes' > ~/.config/nix/nix.conf
-    fi
-
-    # Apply the configuration
     nix profile install ~/.config/nix#orb-nix
     echo "Nix configuration successfully deployed!"
 else
     echo "Error: flake.nix not found in ${NIX_DIR}"
-    exit 1
-fi
-
-if ! command_exists git; then
-    echo "Error: Something went wrong..."
     exit 1
 fi
 
