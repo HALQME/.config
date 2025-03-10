@@ -21,6 +21,7 @@
               lazygit
               neovim
               xh
+              zsh
           ];
       };
 
