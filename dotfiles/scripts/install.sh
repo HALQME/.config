@@ -45,16 +45,20 @@ echo "Deploying Nix configuration..."
 if [ -f "${NIX_DIR}/flake.nix" ]; then
     cd "${NIX_DIR}"
     # Enable flakes if not already enabled
-    if ! nix show-config | grep 'experimental-features.*flakes' >/dev/null; then
-        mkdir -p ~/.config/nix
+    if ! nix config show | grep 'experimental-features.*flakes' >/dev/null; then
         echo 'experimental-features = nix-command flakes' > ~/.config/nix/nix.conf
     fi
 
     # Apply the configuration
-    nix --extra-experimental-features "nix-command flakes" run nixpkgs#home-manager -- switch --flake .
+    nix profile install ~/.config/nix#orb-nix
     echo "Nix configuration successfully deployed!"
 else
     echo "Error: flake.nix not found in ${NIX_DIR}"
+    exit 1
+fi
+
+if ! command_exists git; then
+    echo "Error: Something went wrong..."
     exit 1
 fi
 
