@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
@@ -7,6 +7,8 @@ CONFIG_DIR="${HOME}/.config"
 DOTFILES_DIR="${CONFIG_DIR}/dotfiles"
 NIX_DIR="${CONFIG_DIR}/nix"
 SCRIPTS_DIR="${DOTFILES_DIR}/scripts"
+
+BASE_URL="https://raw.githubusercontent.com/halqme/.config/main"
 
 # Create necessary directories
 mkdir -p "${NIX_DIR}"
@@ -27,14 +29,14 @@ if [ -d "${DOTFILES_DIR}" ]; then
     echo "Dotfiles directory already exists, updating from repository..."
     # Since git is not available, we'll download the latest files
     mkdir -p "${DOTFILES_DIR}/temp"
-    curl -s https://raw.githubusercontent.com/halqme/nix-config/main/.config/dotfiles/scripts/install.sh -o "${SCRIPTS_DIR}/install.sh"
-    curl -s https://raw.githubusercontent.com/halqme/nix-config/main/.config/nix/flake.nix -o "${NIX_DIR}/flake.nix"
+    curl -s "${BASE_URL}/dotfiles/scripts/install.sh" -o "${SCRIPTS_DIR}/install.sh"
+    curl -s "${BASE_URL}/nix/flake.nix" -o "${NIX_DIR}/flake.nix"
     chmod +x "${SCRIPTS_DIR}/install.sh"
 else
     echo "Setting up dotfiles for the first time..."
     mkdir -p "${DOTFILES_DIR}/scripts"
-    curl -s https://raw.githubusercontent.com/halqme/nix-config/main/.config/dotfiles/scripts/install.sh -o "${SCRIPTS_DIR}/install.sh"
-    curl -s https://raw.githubusercontent.com/halqme/nix-config/main/.config/nix/flake.nix -o "${NIX_DIR}/flake.nix"
+    curl -s "${BASE_URL}/dotfiles/scripts/install.sh" -o "${SCRIPTS_DIR}/install.sh"
+    curl -s "${BASE_URL}/nix/flake.nix" -o "${NIX_DIR}/flake.nix"
     chmod +x "${SCRIPTS_DIR}/install.sh"
 fi
 
